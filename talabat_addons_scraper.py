@@ -117,8 +117,6 @@ class TalabatAddonScraper:
         self.save_to_excel()
         print("Scraping and saving complete!")
 
-
-# Example usage:
 scraper = TalabatAddonScraper(
     url="https://www.talabat.com/uae/restaurant/746408/AL-QUOZ-3?aid=1209",
     base_path="C:\\Users\\Yaman_Almobayed\\Desktop\\"
