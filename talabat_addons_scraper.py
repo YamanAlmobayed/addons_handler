@@ -27,6 +27,10 @@ class TalabatAddonScraper:
 
         sheet.append(list(data.values()))
         workbook.save(excel_path)
+        
+    def capitalize_sentence(self, sentence):
+        return ' '.join(word.capitalize() for word in sentence.split())
+
 
     def dict_exists(self, target_dict, data_list, keys):
         """Check if a dictionary with specific keys exists in a list."""
@@ -59,7 +63,7 @@ class TalabatAddonScraper:
                     has_checkboxes = addon_category.query_selector("div[data-testid='choices-checkboxes-component']")
                     category_status = "No" if has_checkboxes else "Yes"
                     
-                    addon_category_name = addon_category.query_selector("strong[data-test='sectionName']").text_content().strip()
+                    addon_category_name = self.capitalize_sentence(addon_category.query_selector("strong[data-test='sectionName']").text_content().strip())
                     count_text = addon_category.query_selector("span.dark-gray.align-middle").text_content()
                     addon_count = re.search(r'\d+', count_text).group() if re.search(r'\d+', count_text) else \
                                   len(addon_category.query_selector_all('div.col-lg-5.col-md-5.col-sm-16.col-16'))
@@ -71,11 +75,11 @@ class TalabatAddonScraper:
                     for addon in addon_category.query_selector_all('div.col-lg-5.col-md-5.col-sm-16.col-16'):
                         addon_name, addon_price = self.extract_addon_details(addon)
                         
-                        item_data = {'item_name': item_name, 'addon_name': addon_name, 'addon_price': addon_price}
+                        item_data = {'item_name': item_name, 'addon_name': addon_name, 'addon_price': addon_price, 'category_status': category_status,}
                         if not self.dict_exists(item_data, self.items_addons_attributes, item_data.keys()):
                             self.items_addons_attributes.append(item_data)
 
-                        addon_data = {'addon_category': addon_category_name, 'addon_name': addon_name, 'addon_price': addon_price}
+                        addon_data = {'addon_category': addon_category_name, 'addon_name': addon_name, 'addon_price': addon_price, 'category_status': category_status}
                         if not self.dict_exists(addon_data, self.addon_attributes, addon_data.keys()):
                             self.addon_attributes.append(addon_data)
 
