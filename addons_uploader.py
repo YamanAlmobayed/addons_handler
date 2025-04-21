@@ -1,10 +1,15 @@
 import pandas as pd
 import asyncio
 from playwright.async_api import async_playwright
+import os
+from credentials import email, password, vendor_name
+
+desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+desktop_path = desktop_path.replace("\\", "\\\\")
 
 LOGIN_URL = "https://vendor.elitewherego.com/login"
 MAIN_URL = "https://vendor.elitewherego.com/addons"
-EXCEL_PATH = "C:\\Users\\Yaman_Almobayed\\Desktop\\sushi_nihoon\\reports\\addons.xlsx"
+EXCEL_PATH = f"{desktop_path}\\{vendor_name}\\addons\\addons.xlsx"
 
 def read_excel_to_dict_list(file_path: str) -> list:
     df = pd.read_excel(file_path, usecols=[0, 1, 2], names=["addon_category", "addon_name", "addon_price"], skiprows=0, header=[0])
@@ -49,6 +54,4 @@ async def automate(USERNAME, PASSWORD):
         
         await browser.close()
 
-USERNAME = "sushinihoon@elitewherego.ae"
-PASSWORD = "7654322"
-asyncio.run(automate(USERNAME, PASSWORD))
+asyncio.run(automate(email, password))

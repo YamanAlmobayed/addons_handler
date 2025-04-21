@@ -2,6 +2,8 @@ from playwright.sync_api import sync_playwright
 import re
 import openpyxl
 from openpyxl.styles import Font
+import os
+from credentials import vendor_name, vendor_url
 
 class TalabatAddonScraper:
     def __init__(self, url, base_path):
@@ -44,12 +46,13 @@ class TalabatAddonScraper:
         addon_name = (label or text_span).text_content().split('(')[0].strip() if label or text_span else None
         price_element = addon.query_selector('label[data-testid="radio"] span.currency') or \
                         addon.query_selector('label.control-label span.currency')
-        addon_price = price_element.text_content().strip() if price_element else ''
+        addon_price = price_element.text_content().strip() if price_element else '0'
 
         return addon_name, addon_price
 
     def extract_addon_categories(self, page, category, selector):
         """Extract all addon categories and their items from the menu."""
+        category_name = category.query_selector('h4.f-20.f-500').inner_html().strip()
         for item in category.query_selector_all(selector):
             try:
                 item_name = item.query_selector('div.f-15').text_content().strip()
@@ -75,7 +78,7 @@ class TalabatAddonScraper:
                     for addon in addon_category.query_selector_all('div.col-lg-5.col-md-5.col-sm-16.col-16'):
                         addon_name, addon_price = self.extract_addon_details(addon)
                         
-                        item_data = {'item_name': item_name, 'addon_name': addon_name, 'addon_price': addon_price, 'category_status': category_status,}
+                        item_data = {'category_name': category_name,'item_name': item_name,'addon_category': addon_category_name, 'addon_name': addon_name, 'addon_price': addon_price, 'category_status': category_status,}
                         if not self.dict_exists(item_data, self.items_addons_attributes, item_data.keys()):
                             self.items_addons_attributes.append(item_data)
 
@@ -117,8 +120,11 @@ class TalabatAddonScraper:
         self.save_to_excel()
         print("Scraping and saving complete!")
 
+desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+desktop_path = desktop_path.replace("\\", "\\\\")
+
 scraper = TalabatAddonScraper(
-    url="https://www.talabat.com/uae/restaurant/746408/AL-QUOZ-3?aid=1209",
-    base_path="C:\\Users\\Yaman_Almobayed\\Desktop\\"
+    url=vendor_url,
+    base_path=f"{desktop_path}\\{vendor_name}\\addons"
 )
 scraper.start()

@@ -2,6 +2,8 @@ from playwright.sync_api import sync_playwright
 import re
 import openpyxl
 from openpyxl.styles import Font
+from credentials import vendor_name, vendor_url
+import os
 
 class DeliverooAddonScraper:
     def __init__(self, url, base_path, browser_context):
@@ -118,12 +120,15 @@ with sync_playwright() as p:
     browser = p.chromium.launch(headless=False)
     context = browser.new_context()
     page = browser.new_page( geolocation={"latitude": 25.186054760669197, "longitude": 55.27504936531868, "accuracy": 100}, permissions=["geolocation"])
-    page.goto('https://deliveroo.ae/menu/dubai/dubai-business-bay/kfc-business-bay/')
+    page.goto(vendor_url)
     page.wait_for_timeout(30000)
 
+    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+    desktop_path = desktop_path.replace("\\", "\\\\")
+
     scraper = DeliverooAddonScraper(
-        url="https://deliveroo.ae/menu/Dubai/dubai-business-bay/kfc-business-bay?day=today&geohash=thrr3bfp76jk&time=ASAP",
-        base_path="C:\\Users\\Yaman_Almobayed\\Desktop\\",
+        url=vendor_url,
+        base_path=f"{desktop_path}",
         browser_context=context
     )
     scraper.start()
